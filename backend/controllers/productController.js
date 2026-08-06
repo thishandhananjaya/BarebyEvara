@@ -27,7 +27,7 @@ export const addProduct = (req,res) => {
         }); 
 }
 
-export const getProductByid = (req,res) => {
+export const getProductById = (req,res) => {
     const id = req.params.id;
     Product.findById(id)
         .then((product) => {
@@ -52,3 +52,17 @@ export const updateProduct = (req,res) => {
     });
 }
 
+export const deleteProduct = (req,res) => {
+    const id = req.params.id;
+    Product.findByIdAndDelete(id)
+     .then((deletedProduct) => {
+        if (!deletedProduct) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        res.json({ message: "Product deleted successfully", product: deletedProduct });
+    })
+
+    .catch((err) => {
+        res.status(500).json({ message: "failed to delete product"});
+    }); };
