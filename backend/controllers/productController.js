@@ -11,7 +11,6 @@ export const getProducts = (req,res) => {
 
 export const addProduct = (req,res) => {
     const product = new Product({
-        productId: req.body.productId,
         title: req.body.title,
         price: req.body.price,
         description: req.body.description,
@@ -28,9 +27,9 @@ export const addProduct = (req,res) => {
         }); 
 }
 
-export const getProductById = (req,res) => {
-    const productId = req.params.productId;
-    Product.findOne({ productId: productId })
+export const getProductByid = (req,res) => {
+    const id = req.params.id;
+    Product.findById(id)
         .then((product) => {
             if (!product) {
                 return res.status(404).json({ message: "Product not found" });
@@ -43,8 +42,8 @@ export const getProductById = (req,res) => {
 }
 
 export const updateProduct = (req,res) => {
-    const productId = req.params.productId;
-    product.findOneAndUpdate({ productId: productId }, req.body, { new: true })
+    const id = req.params.id;
+    Product.findOneAndUpdate({_id: id}, req.body, { new: true })
     .then((updatedProduct) => {
         res.json(updatedProduct);
     })

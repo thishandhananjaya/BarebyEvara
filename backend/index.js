@@ -4,6 +4,7 @@ import Student from "./models/student.js";
 import bodyParser from "body-parser";
 import studentRouter from "./routers/studentRouters.js";
 import userRouter from "./routers/userRouter.js";
+import productRouter from "./routers/productRouter.js";
 
 import jwt from "jsonwebtoken";
 const app = express();
@@ -54,6 +55,9 @@ app.post("/students", studentRouter);
 app.use("/users", userRouter);
 //user login
 app.use("/users/login", userRouter);
+
+//product routes
+app.use("/products", productRouter);
 
 
 
