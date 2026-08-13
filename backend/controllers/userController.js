@@ -7,7 +7,8 @@ export const addUser = (req,res) => {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
-        password: passwordhash
+        password: passwordhash,
+        "phone":req.body.phone
 
     })
     user.save().then(()=>{
