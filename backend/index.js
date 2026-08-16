@@ -1,8 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
-import Student from "./models/student.js";
 import bodyParser from "body-parser";
-import studentRouter from "./routers/studentRouters.js";
 import userRouter from "./routers/userRouter.js";
 import productRouter from "./routers/productRouter.js";
 
@@ -44,18 +42,14 @@ app.use((req, res, next) => {
         next();
     }
 });
-// GET route
-app.use("/students", studentRouter);
-
-// POST route
-
-app.post("/students", studentRouter);
-
+//-----------------------------------------------------------------------User--------------------------------------------------------------
 //user post route
 app.use("/users", userRouter);
 //user login
-app.use("/users/login", userRouter);
+app.use("/users", userRouter);
 
+
+//---------------------------------------------------------------------Products----------------------------------------------------------------
 //product routes
 app.use("/products", productRouter);
 

@@ -1,5 +1,6 @@
 import Product from "../models/product.js";
 
+
 export const getProducts = (req,res) => {
     Product.find()
         .then((products) => {
@@ -20,7 +21,7 @@ export const addProduct = (req,res) => {
     });
     product.save()
         .then((savedProduct) => {
-            res.status(201).json(savedProduct);
+            res.status(201).json({ message: "Product added successfully", product: savedProduct });
         })
         .catch((err) => {
             res.status(500).json({ message: "failed to add product" });
