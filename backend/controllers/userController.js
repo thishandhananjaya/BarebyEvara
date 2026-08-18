@@ -47,7 +47,7 @@ User.findOne({ email: email }).then((user) => {
                 firstname: user.firstName,
                 lastname: user.lastName,
                 role: user.role
-            },"secret-123")
+            },process.env.JWT_SECRET)
 
             return res.json({ message: "Login successful", token })
         }
