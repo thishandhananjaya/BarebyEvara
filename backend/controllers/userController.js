@@ -89,8 +89,13 @@ export const updateUser = (req,res) => {
         phone: req.body.phone,
         isBlocked: req.body.isBlocked
     };
-    User.findOneAndUpdate({_id: id}, updateData, { new: true })
+   
+    User.findOneAndUpdate({_id: id}, updateData, { new: true },"-password")
     .then((updatedUser) => {
+         if (!updatedUser){
+        return res.status(404).json({ message: "User not found" });
+    }
+        return res.status(200).json({message:"user updated successfully"});
         res.json(updatedUser);
     })
     .catch((err) => {
@@ -98,4 +103,16 @@ export const updateUser = (req,res) => {
     });
 }
 
+//delete User by id
+
+export const deleteuser=(req,res)=>{
+    const id = req.params.id;
+    User.findByIdAndDelete(id).then((deletedUser)=>{
+        if(!deletedUser){
+            return res.status(404).json({message:"user not found"})
+        }
+        return res.status(200).json({message:"user deleted successfully"});
+    }).catch((err)=> {
+    return res.status(500).json({message:"failed to delete user"});
+})}
 
