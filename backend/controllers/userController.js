@@ -9,20 +9,36 @@ import jwt from "jsonwebtoken";
 export const addUser = (req, res) => {
 
     // -------------------- Input Validation --------------------
+    const firstName = req.body.firstName?.trim();
+    const lastName = req.body.lastName?.trim();
 
-    if (!req.body.firstName || !req.body.lastName) {
+    if (!firstName || !lastName) {
         return res.status(400).json({
             message: "First name and last name are required"
         });
     }
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
+        return res.status(400).json({
+            message: "First name and last name must contain only letters"
+        });
+    }
 
     // -------------------- Email Validation --------------------
-
-    if (!req.body.email || !req.body.email.includes("@")) {
+    const email = req.body.email?.trim().toLowerCase();
+    if (!email) {
         return res.status(400).json({
             message: "Email is not valid"
         });
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailRegex.test(email)){
+        return res.status(400).json({
+            message: "Email is not valid"
+        });
+    }
+    
+    
 
     // -------------------- Password Validation --------------------
 
@@ -49,15 +65,16 @@ export const addUser = (req, res) => {
     }
 
     // -------------------- Phone Validation --------------------
-
-    if (!req.body.phone) {
+     const phone = req.body.phone?.trim();
+    if (!phone) {
         return res.status(400).json({
             message: "Phone number is required"
         });
     }
+   
     const phoneRegex = /^(0\d{9}|\+94\d{9})$/;
 
-    if (!phoneRegex.test(req.body.phone)) {
+    if (!phoneRegex.test(phone)) {
         return res.status(400).json({
         message: "Invalid phone number. Use 0771234567 or +94771234567"
     });
@@ -84,11 +101,11 @@ export const addUser = (req, res) => {
             // -------------------- Create User --------------------
 
             const user = new User({
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
-                email: req.body.email,
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
                 password: passwordhash,
-                phone: req.body.phone
+                phone: phone
             });
 
             // -------------------- Save User --------------------
@@ -114,13 +131,25 @@ export const addUser = (req, res) => {
 
 
  
-// USER LOGIN
+// USER LOGIN---------------------------------------------------------------------
  
 
 export const loginUser = (req, res) => {
 
-    const email = req.body.email;
+    const email = req.body.email?.trim().toLowerCase();
     const password = req.body.password;
+ //Login input validation------------------------------------------------------------   
+    if(!email){
+        return res.status(400).json({message: "Email is required"});
+
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailRegex.test(email)){
+        return res.status(400).json({message: "Email is not valid"});
+    }
+    if(!password){
+        return res.status(400).json({message: "Password is required"});
+    }   
 
     User.findOne({ email: email })
         .then((user) => {
@@ -152,9 +181,7 @@ export const loginUser = (req, res) => {
 
             const token = jwt.sign(
                 {
-                    email: user.email,
-                    firstname: user.firstName,
-                    lastname: user.lastName,
+                    userId: user._id,
                     role: user.role
                 },
                 process.env.JWT_SECRET,

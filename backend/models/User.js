@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
    },
    phone:{
     type:String,
-    default:"NOT-GIVEN"
+    default:"0712345678 OR +94712345678"
    },
    isBlocked:{
     type:Boolean,
