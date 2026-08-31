@@ -12,7 +12,10 @@ const userSchema = new mongoose.Schema({
    email:{
     type:String,
     required:true,
-    unique:true
+    unique:true,
+    lowercase:true,
+    trim:true,
+    match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
    },
    password:{
       type:String,
@@ -20,7 +23,9 @@ const userSchema = new mongoose.Schema({
    },
    phone:{
     type:String,
-    default:"0712345678 OR +94712345678"
+    required:true,
+    trim:true,
+    match:/^(0\d{9}|\+94\d{9})$/
    },
    isBlocked:{
     type:Boolean,
@@ -28,6 +33,7 @@ const userSchema = new mongoose.Schema({
    },
    role:{
     type:String,
+    enum:["user","admin"],
     default:"user"
    }
 })

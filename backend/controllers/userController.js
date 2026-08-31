@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 // USER REGISTRATION
  
 
-export const addUser = (req, res) => {
+export const addUser = async (req, res) => {
 
     // -------------------- Input Validation --------------------
     const firstName = req.body.firstName?.trim();
@@ -17,6 +17,7 @@ export const addUser = (req, res) => {
             message: "First name and last name are required"
         });
     }
+
     const nameRegex = /^[A-Za-z\s]+$/;
     if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
         return res.status(400).json({
@@ -31,6 +32,7 @@ export const addUser = (req, res) => {
             message: "Email is not valid"
         });
     }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if(!emailRegex.test(email)){
         return res.status(400).json({
@@ -41,14 +43,15 @@ export const addUser = (req, res) => {
     
 
     // -------------------- Password Validation --------------------
+    const password = req.body.password;
 
-    if (!req.body.password) {
+    if (!password) {
         return res.status(400).json({
             message: "Password is required"
         });
     }
 
-    if (req.body.password.length < 8) {
+    if (password.length < 8) {
         return res.status(400).json({
             message: "Password must be at least 8 characters long"
         });
@@ -57,7 +60,7 @@ export const addUser = (req, res) => {
     const passwordRegex =
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-    if (!passwordRegex.test(req.body.password)) {
+    if (!passwordRegex.test(password)) {
         return res.status(400).json({
             message:
                 "Password must contain uppercase, lowercase, number, and special character"
@@ -81,9 +84,9 @@ export const addUser = (req, res) => {
 }
 
     // -------------------- Check Duplicate Email --------------------
-
-    User.findOne({ email: req.body.email })
-        .then((existingUser) => {
+try{
+    const existingUser = await User.findOne({ email: email });
+       
 
             if (existingUser) {
                 return res.status(400).json({
@@ -93,10 +96,7 @@ export const addUser = (req, res) => {
 
             // -------------------- Password Hashing --------------------
 
-            const passwordhash = bcrypt.hashSync(
-                req.body.password,
-                10
-            );
+            const passwordHash = bcrypt.hashSync(password, 10);
 
             // -------------------- Create User --------------------
 
@@ -104,45 +104,53 @@ export const addUser = (req, res) => {
                 firstName: firstName,
                 lastName: lastName,
                 email: email,
-                password: passwordhash,
+                password: passwordHash,
                 phone: phone
             });
 
             // -------------------- Save User --------------------
 
-            user.save()
-                .then(() => {
-                    return res.status(201).json({
-                        message: "User added successfully"
+            
+            await user.save();
+                
+            return res.status(201).json({
+                message: "User added successfully"
                     });
-                })
-                .catch((err) => {
-                    return res.status(500).json({
-                        message: "Failed to add user"
-                    });
+
+            } catch(err) {
+ //------------------------------------------------duplicate email check-------------------------------------------------------------------
+                if(err.code === 11000)
+                    {return res.status(400).json({
+                    message:"Email already exists"
+                      
                 });
-        })
-        .catch((err) => {
-            return res.status(500).json({
-                message: "Failed to check email"
-            });
-        });
-};
+                    }
+            
+                return res.status(500).json({
+                    message: "Failed to add user"
+                    });
+            }};
+        
+             
+
 
 
  
 // USER LOGIN---------------------------------------------------------------------
  
 
-export const loginUser = (req, res) => {
+export const loginUser = async (req, res) => {
 
     const email = req.body.email?.trim().toLowerCase();
+
     const password = req.body.password;
+
  //Login input validation------------------------------------------------------------   
     if(!email){
         return res.status(400).json({message: "Email is required"});
 
     }
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if(!emailRegex.test(email)){
         return res.status(400).json({message: "Email is not valid"});
@@ -150,9 +158,10 @@ export const loginUser = (req, res) => {
     if(!password){
         return res.status(400).json({message: "Password is required"});
     }   
-
-    User.findOne({ email: email })
-        .then((user) => {
+try{
+    
+    const user =await User.findOne({ email: email })
+       
 
             if (!user) {
                 return res.status(404).json({
@@ -193,12 +202,13 @@ export const loginUser = (req, res) => {
                 message: "Login successful",
                 token: token
             });
-        })
-        .catch((err) => {
+        }
+        catch(err) {
+            console.error(err);
             return res.status(500).json({
                 message: "Login failed"
             });
-        });
+        };
 };
 
 
@@ -328,4 +338,4 @@ export const deleteUser = (req, res) => {
             });
 
         });
-};
+}
