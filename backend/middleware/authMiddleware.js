@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
-export function  authMiddleware(req,res,next){
+export async function  authMiddleware(req,res,next){
     const authHeader = req.headers.authorization;
-    if(!authHeader){
+    if(!authHeader || !authHeader.startsWith("Bearer ")){
         return res.status(401).json({message: "Authorization Header Missing"});
     }
 
@@ -11,8 +11,8 @@ export function  authMiddleware(req,res,next){
     try{
         const decoded = jwt.verify(token,process.env.JWT_SECRET);
        
-        User.findById(decoded.userId)
-            .then((user) => {
+        const user = await User.findById(decoded.userId).select("-password");
+            
             if(!user){
                 return res.status(401).json({message: "User not found"});
 
@@ -23,14 +23,11 @@ export function  authMiddleware(req,res,next){
             req.user = user;
             next();
 
-        }).catch((err)=> {
-            return res.status(500).json({message: "Failed to authenticate user" });
+        }catch(err) {
             console.error(err);
-        });
+            return res.status(401).json({message: "Invalid or Expired Token" });
+            
+        };
         
-    }catch(err){
-        return res.status(401).json({message:"Invalid or Expired Token"});
     }
 
-
-} 
