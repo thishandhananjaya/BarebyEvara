@@ -24,7 +24,8 @@ export function  authMiddleware(req,res,next){
             next();
 
         }).catch((err)=> {
-            return res.status(500).json({message: "server not responding" });
+            return res.status(500).json({message: "Failed to authenticate user" });
+            console.error(err);
         });
         
     }catch(err){
