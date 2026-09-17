@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
+import mongoose from "mongoose";
  
 // USER REGISTRATION
  
@@ -271,6 +271,10 @@ export const getUserById = (req, res) => {
 export const updateUser = (req, res) => {
 
     const id = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(400).json({message:"Invalid User ID"});
+    }
 
     const updateData = {
         firstName: req.body.firstName,
