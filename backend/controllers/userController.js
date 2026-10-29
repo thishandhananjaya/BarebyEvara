@@ -275,7 +275,20 @@ export const updateUser = (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)){
         return res.status(400).json({message:"Invalid User ID"});
     }
+    const firstName = req.body.firstName?.trim();
+    const lastName = req.body.lastName?.trim();
 
+    if (!firstName || !lastName) {
+        return res.status(400).json({
+            message:"First name and last name are required"
+        });
+    } 
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if(!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
+        return res.status(400).json({
+            message: "first name and last name must contain only letters"
+        });
+    }
     const updateData = {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
